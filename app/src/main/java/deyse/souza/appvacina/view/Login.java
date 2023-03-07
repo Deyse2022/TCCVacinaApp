@@ -3,6 +3,7 @@ package deyse.souza.appvacina.view;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,7 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import deyse.souza.appvacina.R;
+import deyse.souza.appvacina.api.AppUtil;
 import deyse.souza.appvacina.controller.UsuarioController;
 import deyse.souza.appvacina.model.Usuario;
 
@@ -26,6 +30,10 @@ public class Login extends AppCompatActivity {
     Button btnAcessar, btnCadastro;
 
     boolean isFormularioOk, isLembrarSenha;
+
+    UsuarioController controller;
+
+    private SharedPreferences preferences;
 
 
     @Override
@@ -114,15 +122,41 @@ public class Login extends AppCompatActivity {
         btnCadastro = findViewById(R.id.btnCadastro);
 
         isFormularioOk = false;
+
+
+
+        usuario = new Usuario();
+
+  //      controller = new UsuarioController(getApplicationContext());
+
+
+ //       controller.incluir(usuario);
+  //      controller.alterar(usuario);
+  //      controller.deletar(usuario);
+ //       List<Usuario> usuarios = controller.listar();
+
     }
 
-    public void lembrarSenha(View view) {
+   public void lembrarSenha(View view) {
 
         isLembrarSenha = ckLembrar.isChecked();
 
-    }
+   }
 
     public boolean validarDadosUsuario() {
-        return UsuarioController.validarDadosUsuario();
+
+        return true;
+    }
+
+    private void salvarSharedPreferences(){
+
+       preferences = getSharedPreferences(AppUtil.PREF_APP, MODE_PRIVATE);
+        SharedPreferences.Editor dados = preferences.edit();
+
+    }
+
+    private void restaurarSharedPreferences(){
+
+        preferences = getSharedPreferences(AppUtil.PREF_APP, MODE_PRIVATE);
     }
 }

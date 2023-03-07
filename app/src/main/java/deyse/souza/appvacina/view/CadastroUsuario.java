@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,26 +20,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import deyse.souza.appvacina.R;
+import deyse.souza.appvacina.api.AppUtil;
+import deyse.souza.appvacina.controller.UsuarioController;
+import deyse.souza.appvacina.model.Usuario;
 
 public class CadastroUsuario extends AppCompatActivity {
 
     Button btnCadastro;
-    EditText editNome;
-    EditText editEmail;
-    EditText editSenhaA;
-    EditText editSenhaB;
+    EditText editNome, editEmail, editSenhaA, editSenhaB, editCnes;
 
     TextView txtCnes;
 
-    EditText editCnes;
     CheckBox ckTermo;
 
     RadioButton radioButtonP, radioButtonI;
     RadioGroup radioGroupTipo;
 
     Spinner spinnerEstado, spinnerMunicipio;
-
     boolean isFormularioOK;
+    Usuario novoUsuario;
+    UsuarioController controller;
+    private SharedPreferences preferences;
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -55,54 +58,30 @@ public class CadastroUsuario extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                isFormularioOK = true;
+                if (isFormularioOK = validarFormulario()) {
 
-                if (TextUtils.isEmpty(editNome.getText().toString())) {
-                    editNome.setError("Campo inválido");
-                    editNome.requestFocus();
-                    isFormularioOK = false;
-                }
-                if (TextUtils.isEmpty(editEmail.getText().toString())) {
-                    editEmail.setError("Campo inválido");
-                    editEmail.requestFocus();
-                    isFormularioOK = false;
-                }
-                if (TextUtils.isEmpty(editSenhaA.getText().toString())) {
-                    editSenhaA.setError("Campo inválido");
-                    editSenhaA.requestFocus();
-                    isFormularioOK = false;
-                }
-                if (TextUtils.isEmpty(editSenhaB.getText().toString())) {
-                    editSenhaB.setError("Campo inválido");
-                    editSenhaB.requestFocus();
-                    isFormularioOK = false;
-                }
 
-                if (!ckTermo.isChecked()) {
-                    isFormularioOK = false;
-                }
+                    novoUsuario.setNome(editNome.getText().toString());
+                    novoUsuario.setEmail(editEmail.getText().toString());
+                    novoUsuario.setSenha(editSenhaA.getText().toString());
+                    novoUsuario.setTipoperfil(String.valueOf(radioGroupTipo.getCheckedRadioButtonId()));
+                    novoUsuario.setCnes(editCnes.getText().toString());
+                    novoUsuario.setEstado(spinnerEstado.getSelectedItem().toString());
+                    novoUsuario.setMunicipio(spinnerMunicipio.getSelectedItem().toString());
 
-                if (isFormularioOK) {
+                    salvarSharedPreferences();
 
-                    if (!validarsenha()) {
-                        editSenhaA.setError("Campo inválido");
-                        editSenhaB.setError("Campo inválido");
-                        editSenhaA.requestFocus();
+                    controller.incluir(novoUsuario);
 
-                        Toast.makeText(getApplicationContext(),
-                                "As senhas digitadas não conferem!",
-                                Toast.LENGTH_LONG).show();
+                    Intent iTelaPessoa = new Intent(CadastroUsuario.this, Login.class);
+                    startActivity(iTelaPessoa);
 
-                    } else {
-
-                        Intent iTelaPessoa = new Intent(CadastroUsuario.this, Login.class);
-                        startActivity(iTelaPessoa);
-                    }
                 }
             }
         });
 
     }
+
 
     private void initFormulario() {
         btnCadastro = findViewById(R.id.btnCadastro);
@@ -124,7 +103,15 @@ public class CadastroUsuario extends AppCompatActivity {
 
         radiobutton();
 
+        controller = new UsuarioController(this);
+
         isFormularioOK = false;
+
+        novoUsuario = new Usuario();
+
+        controller = new UsuarioController(this);
+
+
     }
 
     public void vallidarTermo(View view) {
@@ -153,24 +140,26 @@ public class CadastroUsuario extends AppCompatActivity {
     public void radiobutton() {
 
         radioGroupTipo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @SuppressLint("ResourceType")
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
+
                 if (i == R.id.radioButtonP) {
                     txtCnes.setVisibility(View.GONE);
                     editCnes.setVisibility(View.GONE);
 
+
                 } else if (i == R.id.radioButtonI) {
                     txtCnes.setVisibility(View.VISIBLE);
                     editCnes.setVisibility(View.VISIBLE);
+
+
                 }
             }
+
         });
 
-//        if (radioButtonP.isChecked()){
 
-        //       } else if (radioButtonI.isChecked()) {
-
-        //       }
     }
 
     private void carregarDadosSpinner() {
@@ -232,4 +221,65 @@ public class CadastroUsuario extends AppCompatActivity {
             spinnerMunicipio.setAdapter(adapterRS);
         }
     }
+
+    public boolean validarFormulario() {
+
+        boolean retorno = true;
+
+        if (TextUtils.isEmpty(editNome.getText().toString())) {
+            editNome.setError("Campo inválido");
+            editNome.requestFocus();
+            isFormularioOK = false;
+        }
+        if (TextUtils.isEmpty(editEmail.getText().toString())) {
+            editEmail.setError("Campo inválido");
+            editEmail.requestFocus();
+            isFormularioOK = false;
+        }
+        if (TextUtils.isEmpty(editSenhaA.getText().toString())) {
+            editSenhaA.setError("Campo inválido");
+            editSenhaA.requestFocus();
+            isFormularioOK = false;
+        }
+        if (TextUtils.isEmpty(editSenhaB.getText().toString())) {
+            editSenhaB.setError("Campo inválido");
+            editSenhaB.requestFocus();
+            isFormularioOK = false;
+        }
+
+        if (!ckTermo.isChecked()) {
+            isFormularioOK = false;
+        }
+
+        if (isFormularioOK) {
+
+            if (!validarsenha()) {
+                editSenhaA.setError("Campo inválido");
+                editSenhaB.setError("Campo inválido");
+                editSenhaA.requestFocus();
+
+                Toast.makeText(getApplicationContext(),
+                        "As senhas digitadas não conferem!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+        return retorno;
+    }
+
+    private void salvarSharedPreferences() {
+
+        preferences = getSharedPreferences(AppUtil.PREF_APP, MODE_PRIVATE);
+        SharedPreferences.Editor dados = preferences.edit();
+
+        dados.putString("Nome", novoUsuario.getNome());
+        dados.putString("Email", novoUsuario.getEmail());
+        dados.putString("Senha", novoUsuario.getSenha());
+        dados.putString("TipoPerfil", novoUsuario.getTipoperfil());
+        dados.putString("CNES", novoUsuario.getCnes());
+        dados.putString("Estado", novoUsuario.getEstado());
+        dados.putString("Municipio", novoUsuario.getMunicipio());
+        dados.apply();
+    }
+
+
 }

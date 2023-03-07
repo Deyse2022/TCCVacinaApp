@@ -9,6 +9,45 @@ public  class Usuario {
     private String email;
     private String senha;
 
+    private String tipoperfil;
+
+    private String estado;
+
+    private String municipio;
+
+    private String cnes;
+
+    public String getCnes() {
+        return cnes;
+    }
+
+    public void setCnes(String cnes) {
+        this.cnes = cnes;
+    }
+
+    public String getTipoperfil() {
+        return tipoperfil;
+    }
+
+    public void setTipoperfil(String tipoperfil) {
+        this.tipoperfil = tipoperfil;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(String municipio) {
+        this.municipio = municipio;
+    }
 
     public int getId() {
         return id;
