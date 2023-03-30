@@ -21,21 +21,19 @@ public class UsuarioController extends AppDataBase {
         super(context);
     }
 
-    public boolean incluir(Usuario obj){
+    public boolean incluir(Usuario obj) {
 
         dados = new ContentValues();
         dados.put(UsuarioDataModel.NOME, obj.getNome());
         dados.put(UsuarioDataModel.EMAIL, obj.getEmail());
         dados.put(UsuarioDataModel.SENHA, obj.getSenha());
-        dados.put(UsuarioDataModel.TIPOPERFIL, obj.getTipoperfil());
-        dados.put(UsuarioDataModel.CNES, obj.getCnes());
         dados.put(UsuarioDataModel.ESTADO, obj.getEstado());
         dados.put(UsuarioDataModel.MUNICIPIO, obj.getMunicipio());
 
         return insert(TABELA, dados);
     }
 
-    public boolean alterar(Usuario obj){
+    public boolean alterar(Usuario obj) {
 
         dados = new ContentValues();
         dados.put(UsuarioDataModel.ID, obj.getNome());
@@ -50,13 +48,20 @@ public class UsuarioController extends AppDataBase {
         return update(TABELA, dados);
     }
 
-    public boolean deletar(Usuario obj){
+   /* public boolean deletar(Usuario obj) {
 
-        return delete(TABELA, obj.getId());
-    }
+        return delete(TABELA, obj.getIdUsuario());
+    }*/
 
-    public List <Usuario> listar(){
+    public List<Usuario> listar() {
 
         return list(TABELA);
+    }
+
+    public static boolean validarDadosUsuario(Usuario usuario, String email, String senha) {
+
+        boolean retorno =  ((usuario.getEmail() == email) && (usuario.getSenha() == senha));
+
+        return retorno;
     }
 }

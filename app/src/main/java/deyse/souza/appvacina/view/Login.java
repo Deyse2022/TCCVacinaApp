@@ -1,162 +1,115 @@
 package deyse.souza.appvacina.view;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.List;
-
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import deyse.souza.appvacina.R;
-import deyse.souza.appvacina.api.AppUtil;
-import deyse.souza.appvacina.controller.UsuarioController;
+import deyse.souza.appvacina.config.ConfiguracaoFirebase;
+import deyse.souza.appvacina.helper.UsuarioFirebase;
 import deyse.souza.appvacina.model.Usuario;
 
 public class Login extends AppCompatActivity {
 
-    Usuario usuario;
 
-    TextView txtRecuperarSenha, txtLer;
-    EditText editEmail, editSenha;
-    CheckBox ckLembrar;
-    Button btnAcessar, btnCadastro;
-
-    boolean isFormularioOk, isLembrarSenha;
-
-    UsuarioController controller;
-
-    private SharedPreferences preferences;
-
+    private TextInputEditText campoEmail, campoSenha;
+    private FirebaseAuth autenticacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initFormulario();
 
-        btnAcessar.setOnClickListener(new View.OnClickListener() {
+        campoEmail = findViewById(R.id.editLoginEmail);
+        campoSenha = findViewById(R.id.editLoginSenha);
+
+
+    }
+
+        public void validarLoginUsuario(View view){
+
+
+            String textoEmail = campoEmail.getText().toString();
+            String textoSenha = campoSenha.getText().toString();
+
+            if( !textoEmail.isEmpty() ) {
+                if( !textoSenha.isEmpty() ) {
+                    Usuario usuario = new Usuario();
+                    usuario.setEmail( textoEmail );
+                    usuario.setSenha( textoSenha );
+
+                    logarUsuario( usuario );
+
+                }else{
+                    Toast.makeText(Login.this,
+                            "Preencha a senha!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                Toast.makeText(Login.this,
+                        "Preencha o email!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
+
+    public void logarUsuario( Usuario usuario ){
+
+        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+        autenticacao.signInWithEmailAndPassword(
+                usuario.getEmail(), usuario.getSenha()
+        ).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onClick(View view) {
-                if (isFormularioOk = validarFormulario()) {
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if( task.isSuccessful() ){
 
-                    if (validarDadosUsuario()) {
-                        Intent intent =
-                                new Intent(Login.this, Main.class);
-                        startActivity(intent);
-                        finish();
-                        return;
+                    UsuarioFirebase.redirecionaUsuarioLogado(Login.this);
 
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Verifique os dados", Toast.LENGTH_LONG).show();
+                }else {
+
+                    String excecao = "";
+                    try {
+                        throw task.getException();
+                    }catch ( FirebaseAuthInvalidUserException e ) {
+                        excecao = "Usuário não está cadastrado.";
+                    }catch ( FirebaseAuthInvalidCredentialsException e ){
+                        excecao = "E-mail e senha não correspondem a um usuário cadastrado";
+                    }catch (Exception e){
+                        excecao = "Erro ao cadastrar usuário: "  + e.getMessage();
+                        e.printStackTrace();
                     }
+                    Toast.makeText(Login.this,
+                            excecao,
+                            Toast.LENGTH_SHORT).show();
+
                 }
             }
         });
 
-        btnCadastro = findViewById(R.id.btnCadastro);
-
-        btnCadastro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent iTelaCadastro = new Intent(Login.this, CadastroUsuario.class);
-                startActivity(iTelaCadastro);
-            }
-        });
-
-
-        txtRecuperarSenha.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Toast.makeText(getApplicationContext(), "Carregando tela de S",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-
-        txtLer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Toast.makeText(getApplicationContext(), "Carregando tela de P ",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
-    private boolean validarFormulario() {
+        public void lerTermos(View view) {
 
-        boolean retorno = true;
-
-        if (TextUtils.isEmpty(editEmail.getText().toString())) {
-            editEmail.setError("Campo inválido!");
-            editEmail.requestFocus();
-            retorno = false;
+            Toast.makeText(getApplicationContext(), "Aplicativo em fase de testes!",
+                    Toast.LENGTH_LONG).show();
         }
 
-        if (TextUtils.isEmpty(editSenha.getText().toString())) {
-            editSenha.setError("Campo inválido!");
-            editSenha.requestFocus();
-            retorno = false;
-        }
-
-        return retorno;
+    public void abrirTelaCadastro(View view){
+        Intent i = new Intent(Login.this, CadastroUsuario.class);
+        startActivity(i);
     }
 
-    private void initFormulario() {
-
-        txtRecuperarSenha = findViewById(R.id.txtRecuperarSenha);
-        txtLer = findViewById(R.id.txtLer);
-        editEmail = findViewById(R.id.editEmail);
-        editSenha = findViewById(R.id.editSenha);
-        ckLembrar = findViewById(R.id.ckLembrar);
-        btnAcessar = findViewById(R.id.btnAcessar);
-        btnCadastro = findViewById(R.id.btnCadastro);
-
-        isFormularioOk = false;
-
-
-
-        usuario = new Usuario();
-
-  //      controller = new UsuarioController(getApplicationContext());
-
-
- //       controller.incluir(usuario);
-  //      controller.alterar(usuario);
-  //      controller.deletar(usuario);
- //       List<Usuario> usuarios = controller.listar();
-
-    }
-
-   public void lembrarSenha(View view) {
-
-        isLembrarSenha = ckLembrar.isChecked();
-
-   }
-
-    public boolean validarDadosUsuario() {
-
-        return true;
-    }
-
-    private void salvarSharedPreferences(){
-
-       preferences = getSharedPreferences(AppUtil.PREF_APP, MODE_PRIVATE);
-        SharedPreferences.Editor dados = preferences.edit();
-
-    }
-
-    private void restaurarSharedPreferences(){
-
-        preferences = getSharedPreferences(AppUtil.PREF_APP, MODE_PRIVATE);
-    }
 }
+
+

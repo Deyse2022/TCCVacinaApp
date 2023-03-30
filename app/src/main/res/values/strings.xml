@@ -33,4 +33,8 @@
     <string name="radioButtonI">Instituição de Saúde</string>
     <string name="txtCnes">CNES</string>
     <string name="editCnes">Informe o CNES da Instituição</string>
+    <string name="spinnerPerfil">Selecione seu perfil</string>
+    <string name="titulo_cadastro">Cadastrar uma conta</string>
+    <string name="txtTitulo">Cadastro</string>
+    <string name="txtNomes">Nome</string>
 </resources>

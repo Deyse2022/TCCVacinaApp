@@ -12,16 +12,18 @@
         android:theme="@style/Theme.AppVacina"
         tools:targetApi="31">
         <activity
-            android:name=".CadastroPessoa"
+            android:name=".view.MainInstSaude"
             android:exported="false" />
         <activity
             android:name=".view.Login"
             android:exported="false" />
         <activity
             android:name=".view.CadastroUsuario"
-            android:exported="false" />
+            android:exported="false"
+            android:label="@string/titulo_cadastro"
+            android:parentActivityName=".view.Login" />
         <activity
-            android:name=".view.Main"
+            android:name=".view.MainPessoa"
             android:exported="true" />
         <activity
             android:name=".view.Splash"

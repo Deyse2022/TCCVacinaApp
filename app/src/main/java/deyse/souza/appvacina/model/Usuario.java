@@ -2,36 +2,47 @@ package deyse.souza.appvacina.model;
 
 import android.widget.Spinner;
 
-public  class Usuario {
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 
-    private int id;
+import deyse.souza.appvacina.config.ConfiguracaoFirebase;
+
+public class Usuario {
+
+    private String tipo;
     private String Nome;
     private String email;
     private String senha;
-
-    private String tipoperfil;
-
     private String estado;
-
     private String municipio;
+    private String idUsuario;
 
-    private String cnes;
 
-    public String getCnes() {
-        return cnes;
+    public Usuario() {
+
     }
 
-    public void setCnes(String cnes) {
-        this.cnes = cnes;
+    public void salvar() {
+        DatabaseReference firebase = ConfiguracaoFirebase.getFirebaseDatabase();
+        firebase.child("usuários")
+                .child(this.getIdUsuario())
+                .setValue(this);
     }
 
-    public String getTipoperfil() {
-        return tipoperfil;
+    public String getTipo() { return tipo; }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
-    public void setTipoperfil(String tipoperfil) {
-        this.tipoperfil = tipoperfil;
+    public String getIdUsuario() {
+        return idUsuario;
     }
+
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
 
     public String getEstado() {
         return estado;
@@ -49,13 +60,6 @@ public  class Usuario {
         this.municipio = municipio;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return Nome;
@@ -73,6 +77,7 @@ public  class Usuario {
         this.email = email;
     }
 
+    @Exclude
     public String getSenha() {
         return senha;
     }
@@ -80,7 +85,6 @@ public  class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-
 
 
 }
